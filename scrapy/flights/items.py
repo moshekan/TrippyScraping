@@ -10,9 +10,8 @@ from datetime import datetime
 
 from flights.consts import flight_consts
 
+
 class FlightItem(Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
     origin = Field()
     destination = Field()
     departure_datetime = Field()

@@ -25,7 +25,7 @@ class WizzairSpider(BaseFlightSpider):
     API_URL = 'https://be.wizzair.com/7.8.5/Api/search/search'
 
     @classmethod
-    def parse_response(cls, response):
+    def parse(cls, response):
         data = json.loads(response.body.decode('utf-8'))
         flights = []
         if data['outboundFlights']:
@@ -58,8 +58,8 @@ class WizzairSpider(BaseFlightSpider):
         self.from_date = datetime.now()
         self.to_date = datetime.now() + timedelta(days=1)
         self.origin = 'TLV'
-        self.dest = 'Florence'
-        self.adult_count = 2
+        self.dest = 'PRG'
+        self.adults = 2
         self.is_roundtrip = True
         self.length = 5
 
@@ -72,7 +72,8 @@ class WizzairSpider(BaseFlightSpider):
         for date in date_list:
             yield self.api_request(date)
 
-    def _generate_flight_request_dict(self, origin, dest, date):
+    @staticmethod
+    def _generate_flight_request_dict(origin, dest, date):
         flight = {}
         formatted_date = WizzairSpider.format_request_date(date)
         flight['departureStation'] = origin
@@ -80,7 +81,8 @@ class WizzairSpider(BaseFlightSpider):
         flight['departureDate'] = formatted_date
         return flight
 
-    def _generate_wizzair_api_request_json(self, adult_count, child_count, wdc, flights):
+    @staticmethod
+    def _generate_wizzair_api_request_json(adult_count, child_count, wdc, flights):
         formdata = dict(WIZZ_REQUEST_TEMPLATE)
         formdata['flightList'] = flights
         formdata['wdc'] = wdc
@@ -93,17 +95,17 @@ class WizzairSpider(BaseFlightSpider):
         Sends the Request Wizzair's Api and returns the request.
         """
 
-        flights = []
-        flights.append(self._generate_flight_request_dict(self.origin, self.dest, date))
+        flights = [WizzairSpider._generate_flight_request_dict(self.origin, self.dest, date)]
         if self.is_roundtrip:
-            flights.append(self._generate_flight_request_dict(self.dest, self.origin, date + timedelta(days=self.length)))
-        formdata = self._generate_wizzair_api_request_json(
+            flights.append(WizzairSpider._generate_flight_request_dict(self.dest, self.origin,
+                                                                       date + timedelta(days=self.length)))
+        form_data = WizzairSpider._generate_wizzair_api_request_json(
             self.adults, self.children, wdc, flights)
 
-        print formdata
+        print form_data
         request = scrapy.Request(WizzairSpider.API_URL,
                                  method='POST',
-                                 body=json.dumps(formdata),
+                                 body=json.dumps(form_data),
                                  headers={'Content-Type': 'application/json'},
-                                 callback=self.parse_response)
+                                 callback=self.parse)
         return request
