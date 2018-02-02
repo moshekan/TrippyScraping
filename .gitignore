@@ -104,3 +104,5 @@ ENV/
 /scrapyenv
 
 .DS_Store
+
+.idea/
