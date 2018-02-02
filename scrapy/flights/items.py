@@ -8,6 +8,7 @@
 from scrapy.item import Item, Field
 from datetime import datetime
 
+from flights.consts import flight_consts
 
 class FlightItem(Item):
     # define the fields for your item here like:
@@ -25,6 +26,4 @@ class FlightItem(Item):
 
     @staticmethod
     def format_datetime(datetime_obj):
-        if not isinstance(datetime_obj, datetime):
-            raise ValueError('{0} is not a datetime obj'.format(datetime_obj))
-        return datetime_obj.strftime('%Y-%m-%d %H:%M:%S')
+        return datetime_obj.strftime(flight_consts.FLIGHT_DATETIME_FORMAT)
