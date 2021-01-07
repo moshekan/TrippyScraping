@@ -17,7 +17,7 @@ incremental==17.5.0
 ipaddress==1.0.19
 ipython==5.5.0
 ipython-genutils==0.2.0
-lxml==4.1.1
+lxml==4.6.2
 parsel==1.2.0
 pathlib2==2.3.0
 pexpect==4.3.1
